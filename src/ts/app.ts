@@ -2,8 +2,6 @@ import { MainScene } from './scenes/main.scene';
 import { Vector3, Mesh, CubeTextureLoader, CubeTexture } from 'three';
 import { DestinyLoaderBundle, DestinyModelLoader } from './destiny-model-loader/destiny-model-loader';
 import { MaterialHelper } from './destiny-model-loader/material-helper';
-import { DestinyApiConfig } from './destiny-model-loader/destiny-api-config';
-import { Config } from './config';
 import Axios from 'axios';
 import { DestinyGearAssetsDefinition } from './destiny-model-loader/destiny-gear-asset-manifest';
 import Vue from 'vue';
@@ -239,7 +237,6 @@ export class App {
 		let modelLoader:DestinyModelLoader = new DestinyModelLoader();
 		console.log(this.gender);
 		let items = ids.map((id)=>({itemDefinition:this.gearDefinitions[id], female:this.gender == 1}));
-		DestinyApiConfig.APIKey = Config.APIKey;
 		return modelLoader.load(items)
 		.then((models)=>{
 			let meshes:{[id:string]:Mesh} = {};
