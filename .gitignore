@@ -1,0 +1,7 @@
+node_modules
+dist
+.DS_Store
+src/ts/config.ts
+database
+.tern-project
+env-config.js

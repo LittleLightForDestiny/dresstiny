@@ -1,0 +1,22 @@
+{
+	"compileOnSave": false,
+	"compilerOptions": {
+		"outDir": "./dist/",
+		"sourceMap": true,
+		"module": "es2015",
+		"target": "es2015",
+		"allowJs": true,
+		"allowUnusedLabels":false,
+		"noUnusedLocals":true,
+		"moduleResolution": "node"
+	},
+	"include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "node_modules"
+    ],
+	"atom": {
+		"rewriteTsconfig": false
+	}
+}
