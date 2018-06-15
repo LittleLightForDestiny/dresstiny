@@ -70,6 +70,7 @@ export class App {
 		})
 		window.addEventListener("changeGender", (event:CustomEvent)=>{
 			this.gender = event.detail.gender;
+			this.gearSelector.$data.characterGender = this.gender;
 			this.params = {};
 			return this.loadModels(['helmet', 'gauntlets', 'chest', 'boots', 'classItem'])
 			.then((res)=>{
@@ -78,9 +79,13 @@ export class App {
 		})
 		window.addEventListener("openSelector", (event:CustomEvent)=>{
 			this.gearSelector.$data.changerOpened = true;
+			this.gearSelector.$data.changingType = event.detail.itemSubType;
 			this.gearSelector.$data.itemList = this.itemList.filter((item)=>{
+				if(event.detail.isShader){
+					return item.itemSubType == 20;
+				}
 				return item.itemSubType == event.detail.itemSubType &&
-					item.classType == this.characterClass;
+					(item.classType == this.characterClass || item.classType == 3);
 				}).sort((itemA, itemB)=>{
 					return itemB.tierType - itemA.tierType;
 				})
@@ -95,11 +100,23 @@ export class App {
 				29:"boots",
 				30:"classItem"
 			};
-			let type = types[item.itemSubType];
+			let type = types[this.gearSelector.$data.changingType];
+			let shaderType = null;
 			let bundle = {};
-			bundle[type] = item;
+			if(item.itemSubType == 20){
+				shaderType = `${type}Shader`;
+				bundle[shaderType] = item;
+			}else{
+				bundle[type] = item;
+			}
 			this.loadGearDefinitions(bundle)
 			.then((res)=>{
+				if(shaderType){
+					this.itemDefinitions[shaderType] = item;
+					this.gearDefinitions[shaderType] = res[shaderType];
+					this.gearSelector.$data[shaderType] = item;
+					return this.loadModels([type]);
+				}
 				this.itemDefinitions[type] = item;
 				this.gearDefinitions[type] = res[type];
 				this.gearSelector.$data[type] = item;
@@ -183,12 +200,18 @@ export class App {
 				characterClass:this.characterClass,
 				characterGender:this.gender,
 				helmet:null,
+				helmetShader:null,
 				chest:null,
+				chestShader:null,
 				gauntlets:null,
+				gauntletsShader:null,
 				boots:null,
+				bootsShader:null,
 				classItem:null,
+				classItemShader:null,
 				changerItemSubType:null,
 				changerOpened:false,
+				changingType:null,
 				itemList:null
 			},
 			components:{
@@ -236,7 +259,7 @@ export class App {
 	loadModels(ids:string[]) {
 		let modelLoader:DestinyModelLoader = new DestinyModelLoader();
 		console.log(this.gender);
-		let items = ids.map((id)=>({itemDefinition:this.gearDefinitions[id], female:this.gender == 1}));
+		let items = ids.map((id)=>({itemDefinition:this.gearDefinitions[id], shaderDefinition:this.gearDefinitions[`${id}Shader`], female:this.gender == 1}));
 		return modelLoader.load(items)
 		.then((models)=>{
 			let meshes:{[id:string]:Mesh} = {};

@@ -62,7 +62,7 @@ export class BungieNetLoader extends FileLoader {
 		request.addEventListener('error', (event)=>{
 			if (onError) onError(event);
 			this.manager.itemError(url);
-			this.load(url, onLoad, onProgress, onError);
+			this.load(url+"?"+Math.random(), onLoad, onProgress, onError);
 		}, false);
 
 		// if (request.responseType !== undefined) request.responseType = this.responseType as any;

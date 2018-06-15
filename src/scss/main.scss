@@ -17,13 +17,15 @@ body{
 	height:100vh;
 
 	.gear-menu{
-		width:300px;
+		width:320px;
 		right:0px;
 		position: absolute;
 		height:100vh;
 		top:0px;
 		background-color:#CCCCCC;
 		z-index:10;
+		overflow: auto;
+		margin-right: -20px;
 	}
 
 	.gear-list{

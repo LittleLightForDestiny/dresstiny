@@ -119,11 +119,14 @@ export class DestinyMaterialBuilder {
 					dye:dye
 				};
 				// part.flags == 8 // should be transparent or not ?
-
-				material.transparent = part.flags == 13 || part.flags == 10 || part.flags == 32 || part.flags == 34 || (part.flags == 8 && !part.usePrimaryColor);
+				let params = part.usePrimaryColor ? dye.material_properties.primary_material_params : dye.material_properties.secondary_material_params;
+				material.transparent = part.flags == 13 || part.flags == 10 || part.flags == 32 || part.flags == 34 || part.flags == 37 || (part.flags == 8 && !part.usePrimaryColor);
 				material.emissive = new Color().fromArray(dye.material_properties.emissive_tint_color_and_intensity_bias);
 				material.roughness = 1;
 				material.metalness = 1;
+				material.clearCoat = params[1];
+				material.clearCoatRoughness = params[2];
+				material.color.setRGB(1, 1, 1);
 				return material;
 			});
 	}
@@ -186,7 +189,7 @@ export class DestinyMaterialBuilder {
 			let roughnessData = new ImageData(width, height);
 			for (let i = 0; i < gearstackData.data.length; i += 4) {
 				let g = i + 1, a = i + 3;
-				roughnessData.data[g] = gearstackData.data[g];
+				roughnessData.data[g] = 255 - gearstackData.data[g];
 				roughnessData.data[a] = 255;
 			}
 			resolve(roughnessData);

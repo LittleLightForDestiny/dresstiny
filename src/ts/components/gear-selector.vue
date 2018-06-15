@@ -3,11 +3,18 @@
 	<div class="title">
 		{{type}}
 	</div>
-	<div class="item" :style="nameStyle" v-on:click="openSelector()">
-		<div class="item-icon" :style="iconStyle"></div>
+	<div class="item" :style="nameStyle(item)" v-on:click="openSelector(itemSubType, false)">
+		<div class="item-icon" :style="iconStyle(item)"></div>
 		<div class="item-label">
-			<div class="item-name">{{name}}</div>
-			<div class="item-hash">{{hash}}</div>
+			<div class="item-name">{{name(item)}}</div>
+			<div class="item-hash">{{hash(item)}}</div>
+		</div>
+	</div>
+	<div class="shader" :style="nameStyle(shader)" v-on:click="openSelector(itemSubType, true)">
+		<div class="item-icon" :style="iconStyle(shader)"></div>
+		<div class="item-label">
+			<div class="item-name">{{name(shader)}}</div>
+			<div class="item-hash">{{hash(shader)}}</div>
 		</div>
 	</div>
 </div>
@@ -15,28 +22,31 @@
 <script>
 export default {
 	computed:{
-		iconStyle(){
-			if(!this.item) return '';
-			let style = {backgroundImage:`url(http://bungie.net/${this.item.icon})`};
+	},
+	methods:{
+		openSelector(subType, isShader){
+			let event = new CustomEvent("openSelector",{detail:{itemSubType:subType, isShader:isShader}});
+			window.dispatchEvent(event);
+		},
+		iconStyle(item){
+			if(!item) return '';
+			let style = {backgroundImage:`url(http://bungie.net/${item.icon})`};
 			return style;
 		},
-		hash(){
-			if(!this.item) return "";
-			return this.item.hash;
+		hash(item){
+			if(!item) return "";
+			return item.hash;
 		},
-		name(){
-			if(!this.item) return "";
-			if(!this.item.name){
-				console.log(this.item);
-			}
-			return this.item.name;
+		name(item){
+			if(!item) return "";
+			return item.name;
 		},
-		nameStyle(){
-			if(!this.item){
+		nameStyle(item){
+			if(!item){
 				return {};
 			}
 			let color = "#C3BCB4";
-			switch(this.item.tierType){
+			switch(item.tierType){
 				case 3:
 					color = "#306B3D";
 				break;
@@ -53,14 +63,11 @@ export default {
 			return {backgroundColor:color};
 		}
 	},
-	methods:{
-		openSelector(){
-			let event = new CustomEvent("openSelector",{detail:{itemSubType:this.itemSubType}});
-			window.dispatchEvent(event);
-		}
-	},
 	props:{
 		item:{
+			type:Object
+		},
+		shader:{
 			type:Object
 		},
 		type:{
@@ -80,7 +87,7 @@ export default {
     background-color: #333333;
     color: white;
 }
-.item {
+.shader, .item {
 	color:white;
     display: flex;
     flex-flow: row;

@@ -56,7 +56,7 @@ function downloadWorldContent(lang, filename) {
 		db.close();
 		return query;
 	}).then((query)=>{
-		return saveData(`manifest/${lang}`, query, true)
+		return saveData(`manifest/${lang}`, query)
 		.then((data)=>{
 			return saveList(`manifest/${lang}`, query);
 		})
@@ -138,7 +138,7 @@ function saveList(path, data) {
 			classType: json.classType,
 			tierType: json.inventory.tierType
 		};
-		if (json.equippable && obj.name && obj.icon) list.push(obj);
+		if (obj.name && obj.icon) list.push(obj);
 	}
 	let str = JSON.stringify(list);
 	return saveFile(`./database/${path}/list.json`, str);
