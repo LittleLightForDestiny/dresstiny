@@ -142,15 +142,19 @@ export class DestinyModelLoader{
 		let shaderDefault:DestinyDye[] = _get(bundle, 'shaderGear.default_dyes') || [];
 		let shaderCustom:DestinyDye[] = _get(bundle, 'shaderGear.custom_dyes') || [];
 		let shaderLocked:DestinyDye[] = _get(bundle, 'shaderGear.locked_dyes') || [];
-		for(let i=0; i<3; i++){
-			if(itemDefault[i]) dyeset[i] = itemDefault[i];
-			if(shaderDefault[i]) dyeset[i] = shaderDefault[i];
-			if(itemCustom[i]) dyeset[i] = itemCustom[i];
-			if(shaderCustom[i]) dyeset[i] = shaderCustom[i];
-			if(itemLocked[i]) dyeset[i] = itemLocked[i];
-			if(shaderLocked[i]) dyeset[i] = shaderLocked[i];
-		}
+		this.setDyes(shaderLocked, dyeset);
+		this.setDyes(itemLocked, dyeset);
+		this.setDyes(shaderCustom, dyeset);
+		this.setDyes(itemCustom, dyeset);
+		this.setDyes(shaderDefault, dyeset);
+		this.setDyes(itemDefault, dyeset);
 		return dyeset;
+	}
+
+	setDyes(source:DestinyDye[], destination:DestinyDye[]){
+		source.forEach((dye)=>{
+			if(!destination[dye.slot_type_index]) destination[dye.slot_type_index] = dye;
+		});
 	}
 
 }
