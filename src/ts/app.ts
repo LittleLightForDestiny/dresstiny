@@ -25,16 +25,22 @@ export class App {
 
 	init(){
 		this.params = this.extractURLParams();
+		if(this.params.noUI) {
+			document.body.classList.add('no-ui');
+		}else{
+			this.buildInterface();
+		};
 		this.buildScene();
-		this.buildInterface();
 		this.loadDefinitions().then(()=>{
-			this.gearSelector.$data.characterClass = this.characterClass;
-			this.gearSelector.$data.characterGender = this.gender;
-			this.gearSelector.$data.helmet = this.itemDefinitions.helmet;
-			this.gearSelector.$data.gauntlets = this.itemDefinitions.gauntlets;
-			this.gearSelector.$data.chest = this.itemDefinitions.chest;
-			this.gearSelector.$data.boots = this.itemDefinitions.boots;
-			this.gearSelector.$data.classItem = this.itemDefinitions.classItem;
+			if(this.gearSelector){
+				this.gearSelector.$data.characterClass = this.characterClass;
+				this.gearSelector.$data.characterGender = this.gender;
+				this.gearSelector.$data.helmet = this.itemDefinitions.helmet;
+				this.gearSelector.$data.gauntlets = this.itemDefinitions.gauntlets;
+				this.gearSelector.$data.chest = this.itemDefinitions.chest;
+				this.gearSelector.$data.boots = this.itemDefinitions.boots;
+				this.gearSelector.$data.classItem = this.itemDefinitions.classItem;
+			};
 			return this.loadGearDefinitions(this.itemDefinitions);
 		}).then((res)=>{
 			this.gearDefinitions = res;
@@ -334,6 +340,7 @@ interface URLParams{
 	class?:number;
 	gender?:number;
 	debug?:number;
+	noUI?:number;
 }
 
 interface ListItem{

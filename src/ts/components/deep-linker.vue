@@ -14,10 +14,15 @@ export default {
 		'characterClass',
 		'gender',
 		'helmet',
+		'helmetShader',
 		'gauntlets',
+		'gauntletsShader',
 		'chest',
+		'chestShader',
 		'boots',
-		'classItem'
+		'bootsShader',
+		'classItem',
+		'classItemShader'
 	],
 	computed:{
 		link(){
@@ -26,10 +31,15 @@ export default {
 				querystring+=`?class=${this.characterClass}`;
 				querystring+=`&gender=${this.gender}`;
 				querystring+=`&helmet=${this.helmet.hash}`;
+				if(this.helmetShader) querystring+=`&helmetShader=${this.helmetShader.hash}`;
 				querystring+=`&gauntlets=${this.gauntlets.hash}`;
+				if(this.gauntletsShader) querystring+=`&gauntletsShader=${this.gauntletsShader.hash}`;
 				querystring+=`&chest=${this.chest.hash}`;
+				if(this.chestShader) querystring+=`&chestShader=${this.chestShader.hash}`;
 				querystring+=`&boots=${this.boots.hash}`;
+				if(this.bootsShader) querystring+=`&bootsShader=${this.bootsShader.hash}`;
 				querystring+=`&classItem=${this.classItem.hash}`;
+				if(this.classItemShader) querystring+=`&classItemShader=${this.classItemShader.hash}`;
 			}catch(e){
 			}
 

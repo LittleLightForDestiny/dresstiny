@@ -3,6 +3,14 @@ body{
 	padding:0;
 	margin:0;
 	font-family: 'Ubuntu', sans-serif;
+	&.no-ui{
+		#container-3d{
+			width:100vw !important;
+		}
+		#interface{
+			display:none;
+		}
+	}
 }
 #container-3d{
 	position: absolute;
