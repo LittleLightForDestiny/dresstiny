@@ -108,7 +108,11 @@ export class DestinyGeometry extends Geometry{
 		geometry.faceVertexUvs[1] = geometry.faceVertexUvs[0];
 		geometry.rotateX(Math.PI/2);
 		geometry.scale(1, 1, -1);
-
+		geometry.verticesNeedUpdate = true;
+		geometry.normalsNeedUpdate = true;
+		// geometry.computeBoundingSphere();
+		// geometry.computeFaceNormals();
+		geometry.computeVertexNormals();
 		return geometry;
 	}
 

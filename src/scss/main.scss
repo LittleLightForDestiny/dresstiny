@@ -6,7 +6,7 @@ body{
 }
 #container-3d{
 	position: absolute;
-	width:70vw;
+	width:calc(100vw - 320px);
 	top:0px;
 	height:100vh;
 }

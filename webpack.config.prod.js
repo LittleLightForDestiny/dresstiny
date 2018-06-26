@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 	template: __dirname + '/src/index.html',
 	path: "dist",
@@ -79,6 +80,7 @@ module.exports = {
 			'process.env': {
 				NODE_ENV: '"production"'
 			}
-		})
+		}),
+		new UglifyJSPlugin()
 	]
 };
