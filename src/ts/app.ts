@@ -5,14 +5,13 @@ import { MaterialHelper } from './destiny-model-loader/material-helper';
 import Axios from 'axios';
 import { DestinyGearAssetsDefinition } from './destiny-model-loader/destiny-gear-asset-manifest';
 import Vue from 'vue';
-import { find as _find } from 'lodash';
 export class App {
 	params:URLParams;
-    envMap: CubeTexture;
-    scene: MainScene;
+  envMap: CubeTexture;
+  scene: MainScene;
 	container: HTMLElement;
-	itemDefinitions:{[id:string]:ListItem};
-	gearDefinitions:{[id:string]:DestinyGearAssetsDefinition};
+	itemDefinitions:ListItem;
+	gearDefinition:DestinyGearAssetsDefinition;
 	characterClass:number;
 	gender:number;
 	fps: number = 60;
@@ -28,25 +27,13 @@ export class App {
 		if(this.params.noUI) {
 			document.body.classList.add('no-ui');
 		}else{
-			this.buildInterface();
 		};
 		this.buildScene();
-		this.loadDefinitions().then(()=>{
-			if(this.gearSelector){
-				this.gearSelector.$data.characterClass = this.characterClass;
-				this.gearSelector.$data.characterGender = this.gender;
-				this.gearSelector.$data.helmet = this.itemDefinitions.helmet;
-				this.gearSelector.$data.gauntlets = this.itemDefinitions.gauntlets;
-				this.gearSelector.$data.chest = this.itemDefinitions.chest;
-				this.gearSelector.$data.boots = this.itemDefinitions.boots;
-				this.gearSelector.$data.classItem = this.itemDefinitions.classItem;
-			};
-			return this.loadGearDefinitions(this.itemDefinitions);
-		}).then((res)=>{
-			this.gearDefinitions = res;
+		return this.loadGearDefinition(this.params.itemId).then((res)=>{
+			this.gearDefinition = res;
 			return this.loadEnvMap();
 		}).then(()=>{
-			return this.loadModels(['helmet', 'gauntlets', 'chest', 'boots', 'classItem']);
+			return this.loadModel(this.params.itemId);
 		}).then((res)=>{
 			this.addModels(res);
 			this.updateCameraControls();
@@ -59,132 +46,14 @@ export class App {
 		window.addEventListener("changeClass", (event:CustomEvent)=>{
 			this.characterClass = event.detail.classType;
 			this.params = {};
-			this.parseDefinitions();
-			this.loadGearDefinitions(this.itemDefinitions).then((res)=>{
-				this.gearDefinitions = res;
-				this.gearSelector.$data.characterClass = this.characterClass;
-				this.gearSelector.$data.characterGender = this.gender;
-				this.gearSelector.$data.helmet = this.itemDefinitions.helmet;
-				this.gearSelector.$data.gauntlets = this.itemDefinitions.gauntlets;
-				this.gearSelector.$data.chest = this.itemDefinitions.chest;
-				this.gearSelector.$data.boots = this.itemDefinitions.boots;
-				this.gearSelector.$data.classItem = this.itemDefinitions.classItem;
-				return this.loadModels(['helmet', 'gauntlets', 'chest', 'boots', 'classItem']);
+
+			this.loadGearDefinition(this.params.itemId).then((res)=>{
+				this.gearDefinition = res;
+				return this.loadModel(this.params.itemId);
 			}).then((res)=>{
 				this.addModels(res);
 			})
 		})
-		window.addEventListener("changeGender", (event:CustomEvent)=>{
-			this.gender = event.detail.gender;
-			this.gearSelector.$data.characterGender = this.gender;
-			this.params = {};
-			return this.loadModels(['helmet', 'gauntlets', 'chest', 'boots', 'classItem'])
-			.then((res)=>{
-				this.addModels(res);
-			})
-		})
-		window.addEventListener("openSelector", (event:CustomEvent)=>{
-			this.gearSelector.$data.changerOpened = true;
-			this.gearSelector.$data.changingType = event.detail.itemSubType;
-			this.gearSelector.$data.itemList = this.itemList.filter((item)=>{
-				if(event.detail.isShader){
-					return item.itemSubType == 20;
-				}
-				return item.itemSubType == event.detail.itemSubType &&
-					(item.classType == this.characterClass || item.classType == 3);
-				}).sort((itemA, itemB)=>{
-					return itemB.tierType - itemA.tierType;
-				})
-		});
-
-		window.addEventListener("changeItem", (event:CustomEvent)=>{
-			let item:ListItem = event.detail.item;
-			let types = {
-				26:"helmet",
-				27:"gauntlets",
-				28:"chest",
-				29:"boots",
-				30:"classItem"
-			};
-			let type = types[this.gearSelector.$data.changingType];
-			let shaderType = null;
-			let bundle = {};
-			if(item.itemSubType == 20){
-				shaderType = `${type}Shader`;
-				bundle[shaderType] = item;
-			}else{
-				bundle[type] = item;
-			}
-			this.loadGearDefinitions(bundle)
-			.then((res)=>{
-				if(shaderType){
-					this.itemDefinitions[shaderType] = item;
-					this.gearDefinitions[shaderType] = res[shaderType];
-					this.gearSelector.$data[shaderType] = item;
-					return this.loadModels([type]);
-				}
-				this.itemDefinitions[type] = item;
-				this.gearDefinitions[type] = res[type];
-				this.gearSelector.$data[type] = item;
-				return this.loadModels([type]);
-			}).then((res)=>{
-				return this.addModels(res);
-			});
-		});
-	}
-
-	loadDefinitions():Promise<{[id:string]:ListItem}>{
-		return Axios.get(`database/manifest/en/list.json`).then((list)=>{
-			this.itemList = list.data;
-			this.parseDefinitions();
-			return this.itemDefinitions;
-		});
-	}
-
-	parseDefinitions(){
-		if([0,1].indexOf(this.params.gender) > -1){
-			this.gender = this.params.gender;
-		}else if(this.gender == undefined){
-			this.gender = Math.round(Math.random());
-		}
-		if([0,1,2].indexOf(this.params.class) > -1){
-			this.characterClass = this.params.class;
-		}else if (this.characterClass == undefined){
-			this.characterClass = this.getClassFromEquipment();
-		}
-		this.itemDefinitions = {};
-		let pieces = ["helmet", "chest", "gauntlets", "boots", "classItem"];
-		let itemSubTypes = [26, 28, 27, 29, 30];
-		this.itemDefinitions = {};
-		pieces.forEach((piece, index)=>{
-			this.itemDefinitions[piece] = this.getDefinitionForItem(piece, this.characterClass, itemSubTypes[index]);
-		});
-	}
-
-	getDefinitionForItem(pieceName: string, charClass:number, subType: number): any {
-        let hash = this.params[pieceName];
-		let manifest:ListItem = _find(this.itemList, (item)=>item.hash == hash) as ListItem;
-		if(manifest && manifest.classType==charClass && manifest.itemSubType == subType){
-			return manifest;
-		}
-		let filteredList = this.itemList.filter((item)=>item.classType == charClass && item.itemSubType == subType);
-		return filteredList[Math.floor(Math.random()*filteredList.length)];
-    }
-
-	getClassFromEquipment():number{
-		let pieceOrder = ["helmet", "chest", "gauntlets", "boots", "classItem"];
-		let charClass:number;
-		pieceOrder.forEach((piece)=>{
-			if(charClass != undefined || !this.params[piece]) return;
-			let hash = this.params[piece];
-			let manifest:ListItem = _find(this.itemList, (item)=>item.hash == hash) as ListItem;
-			charClass = manifest.classType;
-		});
-
-		if(charClass != undefined){
-			return charClass;
-		}
-		return Math.round(Math.random()*2);
 	}
 
 	buildScene(){
@@ -199,51 +68,10 @@ export class App {
 		},10);
 	}
 
-	buildInterface(){
-		this.gearSelector = new Vue({
-			el:'#interface',
-			data:{
-				characterClass:this.characterClass,
-				characterGender:this.gender,
-				helmet:null,
-				helmetShader:null,
-				chest:null,
-				chestShader:null,
-				gauntlets:null,
-				gauntletsShader:null,
-				boots:null,
-				bootsShader:null,
-				classItem:null,
-				classItemShader:null,
-				changerItemSubType:null,
-				changerOpened:false,
-				changingType:null,
-				itemList:null
-			},
-			components:{
-				'class-selector':require('./components/class-selector.vue').default,
-				'gender-selector':require('./components/gender-selector.vue').default,
-				'gear-selector':require('./components/gear-selector.vue').default,
-				'gear-list':require('./components/gear-list.vue').default,
-				'deep-linker':require('./components/deep-linker.vue').default
-			}
-		});
-	}
-
-	loadGearDefinitions(itemDefinitions){
-		let promises = [];
-		let definitions = {};
-		for(let i in itemDefinitions){
-			let def = itemDefinitions[i];
-			let promise = Axios.get(`database/gearAssets/${def.hash}.json`)
-			.then((res)=>{
-				definitions[i] = res.data;
-				return res;
-			});
-			promises.push(promise);
-		}
-		return Promise.all(promises).then(()=>{
-			return definitions;
+	loadGearDefinition(hash:number):Promise<DestinyGearAssetsDefinition>{
+		let promise = Axios.get(`database/gearAssets/${hash}.json`);
+		return promise.then((res)=>{
+			return res.data as DestinyGearAssetsDefinition;
 		});
 	}
 
@@ -262,17 +90,16 @@ export class App {
 		})
 	}
 
-	loadModels(ids:string[]) {
+	loadModel(id:number) {
 		let modelLoader:DestinyModelLoader = new DestinyModelLoader();
 		console.log(this.gender);
-		let items = ids.map((id)=>({itemDefinition:this.gearDefinitions[id], shaderDefinition:this.gearDefinitions[`${id}Shader`], female:this.gender == 1}));
+		let items = [{itemDefinition:this.gearDefinition, female:this.gender == 1}];
 		return modelLoader.load(items)
 		.then((models)=>{
-			let meshes:{[id:string]:Mesh} = {};
+			let meshes:{[id:number]:Mesh} = {};
 			models.forEach((model:DestinyLoaderBundle, index)=>{
 				MaterialHelper.addPropertyToAllMaterials(model.materials, 'envMap', this.envMap);
-				// MaterialHelper.addPropertyToAllMaterials(model.materials, 'envMapIntensity', 0.2);
-				meshes[ids[index]] = new Mesh(model.geometry, model.materials);
+				meshes[id] = new Mesh(model.geometry, model.materials);
 			});
 			return meshes;
 		});
@@ -327,17 +154,7 @@ export class App {
 }
 
 interface URLParams{
-	helmet?:number;
-	helmetShader?:number;
-	gauntlets?:number;
-	gauntletsShader?:number;
-	chest?:number;
-	chestShader?:number;
-	boots?:number;
-	bootsShader?:number;
-	classItem?:number;
-	classItemShader?:number;
-	class?:number;
+	itemId?:number;
 	gender?:number;
 	debug?:number;
 	noUI?:number;
