@@ -153,7 +153,9 @@ export class DestinyModelLoader{
 
 	setDyes(source:DestinyDye[], destination:DestinyDye[]){
 		source.forEach((dye, index)=>{
-			destination[index] = dye;
+			if(!destination[index]){
+				destination[index] = dye;	
+			}
 		});
 	}
 
