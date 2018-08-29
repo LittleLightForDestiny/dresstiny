@@ -4,6 +4,7 @@ let zip = new require('node-zip');
 let Database = require('better-sqlite3');
 let fs = require('fs');
 let mkdirp = require('mkdirp');
+let _ = require('lodash');
 let basepath = 'http://bungie.net/';
 
 axios.get(`${basepath}Platform/Destiny2/Manifest`, {
@@ -131,12 +132,12 @@ function saveList(path, data) {
 		let json = JSON.parse(str);
 		let obj = {
 			hash: json.hash,
-			name: json.displayProperties.name,
-			icon: json.displayProperties.icon,
+			name: _.get(json, 'displayProperties.name'),
+			icon: _.get(json, 'displayProperties.icon'),
 			itemType: json.itemType,
 			itemSubType: json.itemSubType,
 			classType: json.classType,
-			tierType: json.inventory.tierType
+			tierType: _.get(json, 'inventory.tierType')
 		};
 		if (obj.name && obj.icon) list.push(obj);
 	}
