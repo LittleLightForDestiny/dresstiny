@@ -298,14 +298,12 @@ export class DestinyMaterialBuilder {
 		return new Promise((resolve, reject) => {
 			this.textures[id] = new Texture();
 			let width = plateset.gearstack.width, height = plateset.gearstack.height;
-			let diffuseData = plateset.diffuse.context.getImageData(0, 0, width, height);
+			// let diffuseData = plateset.diffuse.context.getImageData(0, 0, width, height);
 			let gearstackData = plateset.gearstack.context.getImageData(0, 0, width, height);
 			let wornData = new ImageData(width, height);
 			let dyedDrawer = new CanvasDrawer(width, height);
 			let color = part.usePrimaryColor ? dye.material_properties.primary_albedo_tint : dye.material_properties.secondary_albedo_tint;
 			let wornColor = dye.material_properties.worn_albedo_tint;
-			// let dyeParams = part.usePrimaryColor ? dye.material_properties.primary_material_params : dye.material_properties.secondary_material_params;
-			// let wornParams = dye.material_properties.worn_material_parameters;
 			dyedDrawer.context.fillStyle = new Color().fromArray(color).getStyle();
 			dyedDrawer.context.fillRect(0, 0, width, height);
 			let dyeData = dyedDrawer.context.getImageData(0, 0, width, height);
@@ -313,14 +311,16 @@ export class DestinyMaterialBuilder {
 				let r = i, g = i + 1, b = i + 2, a = i + 3;
 				let dyeMask = gearstackData.data[a] > 40 ? 255 : 0;
 				let wornMask = this.getRange(gearstackData.data[a], 48, 255)*255;
-				dyeData.data[r] = this.blend(diffuseData.data[r]/255, color[0])*255;
-				dyeData.data[g] = this.blend(diffuseData.data[g]/255, color[1])*255;
-				dyeData.data[b] = this.blend(diffuseData.data[b]/255, color[2])*255;
+				// dyeData.data[r] = this.blend(diffuseData.data[r]/255, color[0])*255;
+				// dyeData.data[g] = this.blend(diffuseData.data[g]/255, color[1])*255;
+				// dyeData.data[b] = this.blend(diffuseData.data[b]/255, color[2])*255;
+				dyeData.data[r] = color[0]*255;
+				dyeData.data[g] = color[1]*255;
+				dyeData.data[b] = color[2]*255;
 				dyeData.data[a] = dyeMask;
 				wornData.data[r] = wornColor[0]*255;
 				wornData.data[g] = wornColor[1]*255;
 				wornData.data[b] = wornColor[2]*255;
-				wornData.data[a] = 0;
 				wornData.data[a] = wornMask;
 			}
 			dyedDrawer.context.putImageData(dyeData, 0, 0);
@@ -330,6 +330,7 @@ export class DestinyMaterialBuilder {
 				.then(([dye, worn]) => {
 					let drawer: CanvasDrawer = new CanvasDrawer(dye.width, dye.height);
 					drawer.context.drawImage(plateset.diffuse.canvas, 0, 0);
+					drawer.context.globalCompositeOperation = "overlay";
 					drawer.context.drawImage(dye, 0, 0);
 					drawer.context.globalCompositeOperation = "multiply";
 					drawer.context.drawImage(worn, 0, 0);
@@ -342,7 +343,7 @@ export class DestinyMaterialBuilder {
 	}
 
 	blend(blend:number, target:number){
-		return this.overlay(blend, target);
+		return this.overlay(target, blend);
 	}
 
 	overlay2(a:number, b:number){
