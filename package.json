@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --inline --mode=development",
-    "build": "webpack --config webpack.config.prod.js",
+    "start": "webpack-dev-server --inline --mode=development --config webpack.config.dresstiny.js",
+    "build": "webpack --config webpack.config.dresstiny.prod.js",
+	"gear-viewer": "webpack-dev-server --inline --mode=development --config webpack.config.gear-viewer.js",
+    "build-gear-viewer": "webpack --config webpack.config.gear-viewer.prod.js",
     "build-database": "node ./manifest-builder/manifest-builder.js"
   },
   "keywords": [],

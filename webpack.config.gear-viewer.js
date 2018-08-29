@@ -2,8 +2,8 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
-	template: __dirname + '/src/index.html',
-	path: "dist",
+	template: __dirname + '/src/gear-viewer.html',
+	path: "dist-gear-viewer",
 	filename: 'index.html',
 	inject: 'body'
 })
@@ -29,7 +29,7 @@ const CopyWebpackPluginConfig = new CopyWebpackPlugin([{
 }]);
 
 module.exports = {
-	entry: ['./src/ts/index.ts', './src/scss/main.scss'],
+	entry: ['./src/ts/gear-viewer.ts', './src/scss/main.scss'],
 	devtool: 'inline-source-map',
 	module: {
 		rules: [{

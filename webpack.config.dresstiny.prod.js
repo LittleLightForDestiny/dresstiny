@@ -6,7 +6,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 	template: __dirname + '/src/dresstiny.html',
 	path: "dist",
-	filename: 'dresstiny.html',
+	filename: 'index.html',
 	inject: 'body'
 })
 
@@ -19,7 +19,7 @@ const CopyWebpackPluginConfig = new CopyWebpackPlugin([{
 	to: "assets"
 }]);
 module.exports = {
-	entry: ['./src/ts/dresstiny-index.ts', './src/scss/main.scss'],
+	entry: ['./src/ts/dresstiny.ts', './src/scss/main.scss'],
 	devtool: 'inline-source-map',
 	module: {
 		rules: [{

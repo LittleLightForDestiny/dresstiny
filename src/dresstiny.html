@@ -12,5 +12,33 @@
 	</head>
 	<body>
 		<div id="container-3d"></div>
+		<div id="interface">
+			<div class="gear-menu">
+				<class-selector :selected="characterClass"></class-selector>
+				<gender-selector :selected="characterGender"></gender-selector>
+				<gear-selector type="Helmet" :item="helmet" :shader="helmetShader" :item-sub-type="26"></gear-selector>
+				<gear-selector type="Gauntlets" :item="gauntlets" :shader="gauntletsShader" :item-sub-type="27"></gear-selector>
+				<gear-selector type="Chest" :item="chest" :shader="chestShader" :item-sub-type="28"></gear-selector>
+				<gear-selector type="Boots" :item="boots" :shader="bootsShader" :item-sub-type="29"></gear-selector>
+				<gear-selector :type="['Mark', 'Cloak', 'Vow'][characterClass]" :item="classItem" :shader="classItemShader" :item-sub-type="30"></gear-selector>
+				<deep-linker
+					:character-class="characterClass"
+					:gender="characterGender"
+					:helmet="helmet"
+					:helmet-shader="helmetShader"
+					:gauntlets="gauntlets"
+					:gauntlets-shader="gauntletsShader"
+					:chest="chest"
+					:chest-shader="chestShader"
+					:boots="boots"
+					:boots-shader="bootsShader"
+					:class-item="classItem"
+					:class-item-shader="classItemShader"
+				></deep-linker>
+			</div>
+			<div class="gear-list" :class="{open:changerOpened}">
+				<gear-list :list="itemList" :item-sub-type="changerItemSubType" :class-type="characterClass" v-on:close="changerOpened = false"></gear-list>
+			</div>
+		</div>
 	</body>
 </html>

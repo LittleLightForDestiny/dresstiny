@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 	template: __dirname + '/src/dresstiny.html',
-	path: "dist-dresstiny",
+	path: "dist",
 	filename: 'index.html',
 	inject: 'body'
 })

@@ -5,8 +5,8 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 	template: __dirname + '/src/gear-viewer.html',
-	path: "dist",
-	filename: 'gear-viewer.html',
+	path: "dist-gear-viewer",
+	filename: 'index.html',
 	inject: 'body'
 })
 
@@ -19,7 +19,7 @@ const CopyWebpackPluginConfig = new CopyWebpackPlugin([{
 	to: "assets"
 }]);
 module.exports = {
-	entry: ['./src/ts/gear-viewer-index.ts', './src/scss/main.scss'],
+	entry: ['./src/ts/gear-viewer.ts', './src/scss/main.scss'],
 	devtool: 'inline-source-map',
 	module: {
 		rules: [{
@@ -70,7 +70,7 @@ module.exports = {
 	},
 	output: {
 		filename: 'bundle.js',
-		path: path.resolve(__dirname, 'dist')
+		path: path.resolve(__dirname, 'dist-gear-viewer')
 	},
 	plugins: [
 		HTMLWebpackPluginConfig,

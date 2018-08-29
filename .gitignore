@@ -1,5 +1,6 @@
 node_modules
 dist
+dist-gear-viewer
 .DS_Store
 src/ts/config.ts
 database
