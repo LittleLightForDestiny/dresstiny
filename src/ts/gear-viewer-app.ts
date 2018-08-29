@@ -5,84 +5,83 @@ import { MaterialHelper } from './destiny-model-loader/material-helper';
 import Axios from 'axios';
 import { DestinyGearAssetsDefinition } from './destiny-model-loader/destiny-gear-asset-manifest';
 import Vue from 'vue';
-export class App {
-	params:URLParams;
-  envMap: CubeTexture;
-  scene: MainScene;
+export class GearViewerApp {
+	params: URLParams;
+	envMap: CubeTexture;
+	scene: MainScene;
 	container: HTMLElement;
-	itemDefinitions:ListItem;
-	gearDefinition:DestinyGearAssetsDefinition;
-	characterClass:number;
-	gender:number;
+	itemDefinitions: ListItem;
+	gearDefinition: DestinyGearAssetsDefinition;
+	characterClass: number;
+	gender: number;
 	fps: number = 60;
-	itemList:ListItem[];
-	gearSelector:Vue;
-	meshes:{[id:string]:Mesh} = {};
+	itemList: ListItem[];
+	gearSelector: Vue;
+	meshes: { [id: string]: Mesh } = {};
 	constructor() {
 		this.init();
 	}
 
-	init(){
+	init() {
 		this.params = this.extractURLParams();
-		if(this.params.noUI) {
+		if (this.params.noUI) {
 			document.body.classList.add('no-ui');
-		}else{
+		} else {
 		};
 		this.buildScene();
-		return this.loadGearDefinition(this.params.itemId).then((res)=>{
+		this.loadGearDefinition(this.params.itemId).then((res) => {
 			this.gearDefinition = res;
 			return this.loadEnvMap();
-		}).then(()=>{
+		}).then(() => {
 			return this.loadModel(this.params.itemId);
-		}).then((res)=>{
+		}).then((res) => {
 			this.addModels(res);
 			this.updateCameraControls();
 		});
-		this.initEventListeners();
-		if(this.params.debug) this.scene.setupDebugger();
+		if (this.params.debug) this.scene.setupDebugger();
 	}
 
-	initEventListeners(){
-		window.addEventListener("changeClass", (event:CustomEvent)=>{
+	initEventListeners() {
+		window.addEventListener("changeClass", (event: CustomEvent) => {
 			this.characterClass = event.detail.classType;
 			this.params = {};
 
-			this.loadGearDefinition(this.params.itemId).then((res)=>{
+			this.loadGearDefinition(this.params.itemId).then((res) => {
 				this.gearDefinition = res;
 				return this.loadModel(this.params.itemId);
-			}).then((res)=>{
+			}).then((res) => {
 				this.addModels(res);
 			})
 		})
 	}
 
-	buildScene(){
+	buildScene() {
 		this.container = document.getElementById('container-3d');
 		this.scene = new MainScene(this.container.offsetWidth, this.container.offsetHeight, this.container);
-		window.onresize = ()=>{
+		window.onresize = () => {
 			this.scene.changeSize(this.container.offsetWidth, this.container.offsetHeight);
 		};
 		this.container.appendChild(this.scene.renderer.domElement);
-		setInterval(()=>{
+		setInterval(() => {
 			this.scene.render();
-		},10);
+		}, 10);
 	}
 
-	loadGearDefinition(hash:number):Promise<DestinyGearAssetsDefinition>{
+	loadGearDefinition(hash: number): Promise<DestinyGearAssetsDefinition> {
 		let promise = Axios.get(`database/gearAssets/${hash}.json`);
-		return promise.then((res)=>{
+		return promise.then((res) => {
 			return res.data as DestinyGearAssetsDefinition;
 		});
 	}
 
-	loadEnvMap(){
-		return new Promise((resolve)=>{
+	loadEnvMap() {
+		return new Promise((resolve) => {
 			let textureLoader = new CubeTextureLoader();
 			textureLoader.load([
-				'assets/cubeleft.jpg','assets/cuberight.jpg',
-				'assets/cubeback.jpg','assets/cubefront.jpg',
-				'assets/cubedown.jpg','assets/cubeup.jpg',
-			], (envMap)=>{
+				'assets/cubeleft.jpg', 'assets/cuberight.jpg',
+				'assets/cubeback.jpg', 'assets/cubefront.jpg',
+				'assets/cubedown.jpg', 'assets/cubeup.jpg',
+			], (envMap) => {
 				envMap.generateMipmaps = true;
 				this.envMap = envMap;
 				resolve(envMap);
@@ -90,24 +89,24 @@ export class App {
 		})
 	}
 
-	loadModel(id:number) {
-		let modelLoader:DestinyModelLoader = new DestinyModelLoader();
+	loadModel(id: number) {
+		let modelLoader: DestinyModelLoader = new DestinyModelLoader();
 		console.log(this.gender);
-		let items = [{itemDefinition:this.gearDefinition, female:this.gender == 1}];
+		let items = [{ itemDefinition: this.gearDefinition, female: this.gender == 1 }];
 		return modelLoader.load(items)
-		.then((models)=>{
-			let meshes:{[id:number]:Mesh} = {};
-			models.forEach((model:DestinyLoaderBundle, index)=>{
-				MaterialHelper.addPropertyToAllMaterials(model.materials, 'envMap', this.envMap);
-				meshes[id] = new Mesh(model.geometry, model.materials);
+			.then((models) => {
+				let meshes: { [id: number]: Mesh } = {};
+				models.forEach((model: DestinyLoaderBundle) => {
+					MaterialHelper.addPropertyToAllMaterials(model.materials, 'envMap', this.envMap);
+					meshes[id] = new Mesh(model.geometry, model.materials);
+				});
+				return meshes;
 			});
-			return meshes;
-		});
 	}
 
-	addModels(meshes:{[id:string]:Mesh}){
-		for(let i in meshes){
-			if(this.meshes[i]) {
+	addModels(meshes: { [id: string]: Mesh }) {
+		for (let i in meshes) {
+			if (this.meshes[i]) {
 				this.scene.remove(this.meshes[i]);
 				this.meshes[i] = null;
 			}
@@ -118,19 +117,19 @@ export class App {
 		};
 	}
 
-	updateCameraControls(){
-		let min:Vector3;
-		let max:Vector3;
-		for(let i in this.meshes){
+	updateCameraControls() {
+		let min: Vector3;
+		let max: Vector3;
+		for (let i in this.meshes) {
 			let mesh = this.meshes[i];
-			if(!min) min = mesh.geometry.boundingBox.min;
-			if(!max) max = mesh.geometry.boundingBox.max;
+			if (!min) min = mesh.geometry.boundingBox.min;
+			if (!max) max = mesh.geometry.boundingBox.max;
 			min.min(mesh.geometry.boundingBox.min);
 			max.max(mesh.geometry.boundingBox.max);
 		};
-		let center = new Vector3(max.x/2 +min.x/2, max.y/2 + min.y/2, max.z/2 + min.z/2);
-		let maxDistance:number = 0;
-		['x', 'y', 'z'].forEach((prop)=>{
+		let center = new Vector3(max.x / 2 + min.x / 2, max.y / 2 + min.y / 2, max.z / 2 + min.z / 2);
+		let maxDistance: number = 0;
+		['x', 'y', 'z'].forEach((prop) => {
 			maxDistance = Math.max(maxDistance, Math.abs(center[prop] - max[prop]));
 			maxDistance = Math.max(maxDistance, Math.abs(center[prop] - min[prop]));
 		});
@@ -138,34 +137,34 @@ export class App {
 	}
 
 	extractURLParams(): any {
-		try{
+		try {
 			let paramString = window.location.href.split('?')[1];
 			let params = paramString.split("&");
 			let paramResult = {};
-			params.forEach((param)=>{
+			params.forEach((param) => {
 				let splitted = param.split('=');
 				paramResult[splitted[0]] = parseInt(splitted[1]);
 			})
-	        return paramResult;
-		}catch(e){
+			return paramResult;
+		} catch (e) {
 			return {};
 		}
-    }
+	}
 }
 
-interface URLParams{
-	itemId?:number;
-	gender?:number;
-	debug?:number;
-	noUI?:number;
+interface URLParams {
+	itemId?: number;
+	gender?: number;
+	debug?: number;
+	noUI?: number;
 }
 
-interface ListItem{
-	name:string;
-	hash:number;
-	icon:string;
-	itemType:number;
-	itemSubType:number;
-	classType:number;
-	tierType:number;
+interface ListItem {
+	name: string;
+	hash: number;
+	icon: string;
+	itemType: number;
+	itemSubType: number;
+	classType: number;
+	tierType: number;
 }

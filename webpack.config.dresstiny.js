@@ -1,15 +1,24 @@
 const path = require('path');
-const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 	template: __dirname + '/src/dresstiny.html',
-	path: "dist",
-	filename: 'dresstiny.html',
+	path: "dist-dresstiny",
+	filename: 'index.html',
 	inject: 'body'
 })
 
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
+const BrowserSyncPluginConfig = new BrowserSyncPlugin({
+	host: 'localhost',
+	port: 3000,
+	open: false,
+	proxy: 'http://localhost:8080/'
+}, config = {
+	injectCss: true,
+	server: 'database',
+	reload: true
+});
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const CopyWebpackPluginConfig = new CopyWebpackPlugin([{
 	from: "src/lib",
@@ -18,8 +27,9 @@ const CopyWebpackPluginConfig = new CopyWebpackPlugin([{
 	from: "src/assets",
 	to: "assets"
 }]);
+
 module.exports = {
-	entry: ['./src/ts/dresstiny-index.ts', './src/scss/main.scss'],
+	entry: ['./src/ts/dresstiny.ts', './src/scss/main.scss'],
 	devtool: 'inline-source-map',
 	module: {
 		rules: [{
@@ -72,15 +82,14 @@ module.exports = {
 		filename: 'bundle.js',
 		path: path.resolve(__dirname, 'dist')
 	},
+	mode: 'development',
+	devServer: {
+		open: false
+	},
 	plugins: [
 		HTMLWebpackPluginConfig,
+		BrowserSyncPluginConfig,
 		CopyWebpackPluginConfig,
-		new VueLoaderPlugin(),
-		new webpack.DefinePlugin({
-			'process.env': {
-				NODE_ENV: '"production"'
-			}
-		}),
-		new UglifyJSPlugin()
+		new VueLoaderPlugin()
 	]
 };

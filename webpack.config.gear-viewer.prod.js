@@ -4,9 +4,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
-	template: __dirname + '/src/dresstiny.html',
+	template: __dirname + '/src/gear-viewer.html',
 	path: "dist",
-	filename: 'dresstiny.html',
+	filename: 'gear-viewer.html',
 	inject: 'body'
 })
 
@@ -19,7 +19,7 @@ const CopyWebpackPluginConfig = new CopyWebpackPlugin([{
 	to: "assets"
 }]);
 module.exports = {
-	entry: ['./src/ts/dresstiny-index.ts', './src/scss/main.scss'],
+	entry: ['./src/ts/gear-viewer-index.ts', './src/scss/main.scss'],
 	devtool: 'inline-source-map',
 	module: {
 		rules: [{
