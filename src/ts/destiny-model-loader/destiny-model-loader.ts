@@ -152,8 +152,8 @@ export class DestinyModelLoader{
 	}
 
 	setDyes(source:DestinyDye[], destination:DestinyDye[]){
-		source.forEach((dye)=>{
-			if(!destination[dye.slot_type_index]) destination[dye.slot_type_index] = dye;
+		source.forEach((dye, index)=>{
+			destination[index] = dye;
 		});
 	}
 
