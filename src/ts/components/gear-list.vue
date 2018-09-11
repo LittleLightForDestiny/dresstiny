@@ -18,6 +18,9 @@ export default {
 				return item.itemSubType == this.itemSubType &&
 					item.classType == this.classType;
 			}).sort((itemA, itemB)=>{
+				if(itemA.tierType == itemB.tierType){
+					return itemB.index - itemA.index;
+				}
 				return itemB.tierType - itemA.tierType;
 			})
 		}

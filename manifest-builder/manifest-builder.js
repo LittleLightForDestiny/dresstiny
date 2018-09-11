@@ -134,9 +134,11 @@ function saveList(path, data) {
 			hash: json.hash,
 			name: _.get(json, 'displayProperties.name'),
 			icon: _.get(json, 'displayProperties.icon'),
+			index: json.index,
 			itemType: json.itemType,
 			itemSubType: json.itemSubType,
 			classType: json.classType,
+			previewItemOverrideHash : _.get(json, 'plug.previewItemOverrideHash'),
 			tierType: _.get(json, 'inventory.tierType')
 		};
 		if (obj.name && obj.icon) list.push(obj);

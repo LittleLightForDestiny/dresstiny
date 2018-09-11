@@ -5,7 +5,7 @@ import { MaterialHelper } from './destiny-model-loader/material-helper';
 import Axios from 'axios';
 import { DestinyGearAssetsDefinition } from './destiny-model-loader/destiny-gear-asset-manifest';
 import Vue from 'vue';
-import { find as _find } from 'lodash';
+import { find as _find, findIndex as _findIndex} from 'lodash';
 export class DresstinyApp {
 	params:URLParams;
     envMap: CubeTexture;
@@ -86,15 +86,30 @@ export class DresstinyApp {
 		window.addEventListener("openSelector", (event:CustomEvent)=>{
 			this.gearSelector.$data.changerOpened = true;
 			this.gearSelector.$data.changingType = event.detail.itemSubType;
-			this.gearSelector.$data.itemList = this.itemList.filter((item)=>{
+			let itemList = this.itemList.filter((item)=>{
 				if(event.detail.isShader){
 					return item.itemSubType == 20;
 				}
 				return item.itemSubType == event.detail.itemSubType &&
-					(item.classType == this.characterClass || item.classType == 3);
+					(item.classType == this.characterClass);
 				}).sort((itemA, itemB)=>{
-					return itemB.tierType - itemA.tierType;
-				})
+					return (itemB.tierType - itemA.tierType) || (itemB.index - itemA.index);
+				});
+
+			let ornaments = this.itemList.filter((item)=>{
+				return item.itemSubType == 21 && item.classType == this.characterClass;
+			}).sort((itemA, itemB)=>{
+				return itemB.index - itemA.index;
+			});
+
+			ornaments.forEach((ornament)=>{
+				let index = _findIndex(itemList, {hash:ornament.previewItemOverrideHash});
+				if(index > -1){
+					itemList.splice(index+1, 0, ornament);
+				}
+			});
+
+			this.gearSelector.$data.itemList = itemList;
 		});
 
 		window.addEventListener("changeItem", (event:CustomEvent)=>{
@@ -347,8 +362,10 @@ interface ListItem{
 	name:string;
 	hash:number;
 	icon:string;
+	index:number;
 	itemType:number;
 	itemSubType:number;
 	classType:number;
 	tierType:number;
+	previewItemOverrideHash:number;
 }
