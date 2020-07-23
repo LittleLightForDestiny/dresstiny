@@ -6,7 +6,7 @@
   "scripts": {
     "start": "webpack-dev-server --inline --mode=development --config webpack.config.dresstiny.js",
     "build": "webpack --config webpack.config.dresstiny.prod.js",
-	"gear-viewer": "webpack-dev-server --inline --mode=development --config webpack.config.gear-viewer.js",
+    "gear-viewer": "webpack-dev-server --inline --mode=development --config webpack.config.gear-viewer.js",
     "build-gear-viewer": "webpack --config webpack.config.gear-viewer.prod.js",
     "build-database": "node ./manifest-builder/manifest-builder.js"
   },
@@ -16,7 +16,7 @@
   "devDependencies": {
     "@types/es6-promise": "^3.3.0",
     "axios": "^0.18.1",
-    "better-sqlite3": "^4.1.4",
+    "better-sqlite3": "^7.1.0",
     "browser-sync": "^2.24.4",
     "browser-sync-webpack-plugin": "^2.2.2",
     "copy-webpack-plugin": "^4.5.1",
