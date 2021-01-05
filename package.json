@@ -15,7 +15,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/es6-promise": "^3.3.0",
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "better-sqlite3": "^7.1.0",
     "browser-sync": "^2.24.4",
     "browser-sync-webpack-plugin": "^2.2.2",
