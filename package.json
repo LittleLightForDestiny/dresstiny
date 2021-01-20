@@ -52,7 +52,7 @@
     "babel-preset-env": "^1.7.0",
     "bungie-api-ts": "^1.8.0",
     "debug": "^3.1.0",
-    "gsap": "^2.0.1",
+    "gsap": "^3.6.0",
     "jszip": "^3.1.5",
     "localforage": "^1.7.1",
     "lodash": "^4.17.19",
