@@ -24,7 +24,7 @@
     "extract-loader": "^2.0.1",
     "file-loader": "^1.1.11",
     "hoek": "^5.0.3",
-    "html-webpack-plugin": "^3.2.0",
+    "html-webpack-plugin": "^5.5.0",
     "mkdirp": "^0.5.1",
     "node-sass": "^4.14.1",
     "node-zip": "^1.1.1",
